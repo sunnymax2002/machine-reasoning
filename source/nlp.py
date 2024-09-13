@@ -7,7 +7,7 @@ from sbert_dist import sbert_embeddings, cosine_similarity
 # Babel for text to entity, relation triples: https://huggingface.co/Babelscape/rebel-large
 triplet_extractor = pipeline('text2text-generation', model='Babelscape/rebel-large', tokenizer='Babelscape/rebel-large')
 
-text = "Cow is a mammal and has four legs" # "Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"
+text = "Eiffel Tower is located in Paris" # "Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"
 
 # We need to use the tokenizer manually since we need special tokens.
 extracted_text = triplet_extractor.tokenizer.batch_decode([triplet_extractor(text, return_tensors=True, return_text=False)[0]["generated_token_ids"]])
@@ -85,5 +85,6 @@ for triple in extracted_triplets:
             pass
     
     kt = KnowledgeTriplet(
-        subject=KnowledgeTripletItem(item=triple['subject'])
+        subject=KnowledgeTripletItem(item=triple['subject']),
+        object=KnowledgeTripletItem(item=triple['object'])
     )
