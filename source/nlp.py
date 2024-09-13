@@ -2,11 +2,12 @@ from transformers import pipeline
 import requests
 
 from models import *
+from sbert_dist import sbert_embeddings, cosine_similarity
 
 # Babel for text to entity, relation triples: https://huggingface.co/Babelscape/rebel-large
 triplet_extractor = pipeline('text2text-generation', model='Babelscape/rebel-large', tokenizer='Babelscape/rebel-large')
 
-text = "An athelete is physically very strong" # "Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"
+text = "Cow is a mammal and has four legs" # "Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"
 
 # We need to use the tokenizer manually since we need special tokens.
 extracted_text = triplet_extractor.tokenizer.batch_decode([triplet_extractor(text, return_tensors=True, return_text=False)[0]["generated_token_ids"]])
@@ -55,15 +56,25 @@ def find_wikidata_entity(item):
     # Return the first id (Could upgrade this in the future)
 
     if 'search' in data and len(data['search']) > 0:
-        # TODO: Extract 'instance of' from wikidata
+        # Find closest match between [d['label'] for d in data['search']] and item, instead of reporting 1st result
+        embs = sbert_embeddings([item] + [d['label'] for d in data['search']])
+        emb0 = embs[0]
+
+        sims = []
+        for i in range(1, len(embs)):
+            sims.append(cosine_similarity(emb0, embs[i]))
+
+        best_match = sims.index(max(sims))
+
         return KnowledgeTripletItem(
             item=item,
-            info=data['search'][0]['display']['description']['value'],
-            url='https:' + data['search'][0]['url']
+            info=data['search'][best_match]['description'],
+            url='https:' + data['search'][best_match]['url']
         )
-    
+    else:
+        return None
   except:
-    return 'id-less'
+    return None
     
 for triple in extracted_triplets:
     std_data = {}

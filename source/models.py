@@ -5,7 +5,7 @@ class KnowledgeTripletItem(BaseModel):
     item: str
     info: str
     url: str
-    type_: Optional[str]
+    type_: Optional[str] = ''
 
 class KnowledgeTriplet(BaseModel):
     subject: KnowledgeTripletItem
