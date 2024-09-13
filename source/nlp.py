@@ -6,7 +6,7 @@ from models import *
 # Babel for text to entity, relation triples: https://huggingface.co/Babelscape/rebel-large
 triplet_extractor = pipeline('text2text-generation', model='Babelscape/rebel-large', tokenizer='Babelscape/rebel-large')
 
-text = "Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"
+text = "An athelete is physically very strong" # "Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"
 
 # We need to use the tokenizer manually since we need special tokens.
 extracted_text = triplet_extractor.tokenizer.batch_decode([triplet_extractor(text, return_tensors=True, return_text=False)[0]["generated_token_ids"]])
@@ -45,19 +45,22 @@ def extract_triplets(text):
 extracted_triplets = extract_triplets(extracted_text[0])
 print(extracted_triplets)
 
+# exit()
+
 # Wikidata API to look-up terms and map to standard ontology: https://towardsdatascience.com/extract-knowledge-from-text-end-to-end-information-extraction-pipeline-with-spacy-and-neo4j-502b2b1e0754
-def call_wiki_api(item):
+def find_wikidata_entity(item):
   try:
     url = f"https://www.wikidata.org/w/api.php?action=wbsearchentities&search={item}&language=en&format=json"
     data = requests.get(url).json()
     # Return the first id (Could upgrade this in the future)
 
-    # TODO: Extract 'instance of' from wikidata
-    return KnowledgeTripletItem(
-        item=item,
-        info=data['search'][0]['display']['description']['value'],
-        url='https:' + data['search'][0]['url']
-    )
+    if 'search' in data and len(data['search']) > 0:
+        # TODO: Extract 'instance of' from wikidata
+        return KnowledgeTripletItem(
+            item=item,
+            info=data['search'][0]['display']['description']['value'],
+            url='https:' + data['search'][0]['url']
+        )
     
   except:
     return 'id-less'
@@ -65,7 +68,10 @@ def call_wiki_api(item):
 for triple in extracted_triplets:
     std_data = {}
     for k, v in triple.items():
-        std_data[k] = call_wiki_api(v)
+        if k in ('head', 'tail'):
+            std_data[k] = find_wikidata_entity(v)
+        if k == 'type':
+            pass
     
     kt = KnowledgeTriplet(
         subject=KnowledgeTripletItem(item=triple['subject'])
