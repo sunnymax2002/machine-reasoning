@@ -58,14 +58,18 @@ def get_entity(item: str):
 
     return data
 
-def get_typeof(item: str):
-    """Returns the uri(s) of all the wikidata entities whose subclass the item (Q...) is"""
+def get_typeof(item: str, subclass=False):
+    """If subclass=True, Returns the uri(s) of all the wikidata entities whose subclass the item (Q...) is,
+    else, returns instanceOf...
+    """
+
+    rel_type = P_SUBCLASS_OF if subclass else P_INSTANCE_OF
     try:
-        r = wikidata_sparql_api('''SELECT ?class
+        r = wikidata_sparql_api(f'''SELECT ?class
     WHERE
-    {
-    wd:{item} wdt:P279 ?class
-    }''')
+    {{
+    {PREFIX_E}{item} {PREFIX_P}{rel_type} ?class
+    }}''')
         
         res = []
         for c in r['results']['bindings']:
@@ -74,6 +78,6 @@ def get_typeof(item: str):
     except:
         return []
 
-res = get_typeof('Q11748378')
+# res = get_typeof('Q11748378')
 
-print('done')
+# print('done')

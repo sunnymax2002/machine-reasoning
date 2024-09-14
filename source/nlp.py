@@ -5,7 +5,7 @@ from transformers import pipeline
 from models import *
 from sbert_dist import sbert_embeddings
 from utils import nearest_vector
-from wikidata_tools import search_entity
+from wikidata_tools import search_entity, get_typeof
 
 class KnowledgeExtractor:
     def __init__(self) -> None:
@@ -73,10 +73,16 @@ class KnowledgeExtractor:
                     embs = sbert_embeddings([item] + q_lbls)
                     best_match = nearest_vector(embs[0], embs[1:])
 
+                entity = data['search'][best_match]
+
+                # TODO: How to select type from inst_of / subclass_of?
+                inst_of = get_typeof(entity['id'])
+                subclass_of = get_typeof(entity['id'], subclass=True)
                 return KnowledgeTripletItem(
-                    item=item,
-                    info=data['search'][best_match]['description'],
-                    url='https:' + data['search'][best_match]['url']
+                    item=entity['label'],
+                    info=entity['description'],
+                    url=entity['concepturi'],
+                    type_=inst_of
                 )
             else:
                 return KnowledgeTripletItem(item=item)
