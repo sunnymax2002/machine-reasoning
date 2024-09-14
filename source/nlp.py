@@ -1,10 +1,11 @@
+from typing import List
+
 from transformers import pipeline
-import requests
 
 from models import *
 from sbert_dist import sbert_embeddings
 from utils import nearest_vector
-from typing import List
+from wikidata_tools import search_entity
 
 class KnowledgeExtractor:
     def __init__(self) -> None:
@@ -59,9 +60,8 @@ class KnowledgeExtractor:
 
         # Wikidata API to look-up terms and map to standard ontology: https://towardsdatascience.com/extract-knowledge-from-text-end-to-end-information-extraction-pipeline-with-spacy-and-neo4j-502b2b1e0754
         try:
-            url = f"https://www.wikidata.org/w/api.php?action=wbsearchentities&search={item}&language=en&format=json"
-            data = requests.get(url).json()
-            # Return the first id (Could upgrade this in the future)
+            # Search item in wikidata
+            data = search_entity(item)
 
             if 'search' in data and len(data['search']) > 0:
                 # First do an exact text match in labels from qurry result
@@ -86,12 +86,9 @@ class KnowledgeExtractor:
     def extract(self, text: str) -> List[KnowledgeTriplet]:
         extracted_triplets_text = self.run_babel(text)
 
-        # extracted_triplets_text = '<s><triplet> Eiffel Tower <subj> Paris <obj> located in the administrative territorial entity</s>'
-
+        # TODO: For each extracted text
         # Convert to Triple
         triplets = self.babel_extract_2_triple(extracted_triplets_text[0])
-
-# print(triplets)
     
         kt_list = []
         for triple in triplets:
@@ -121,8 +118,7 @@ texts = ["Eiffel Tower is located in Paris",
          "Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic",
          "Dog is a mammal",
          "Cleopatra was very beautiful",
-         "Mahatma Gandhi was born on 2nd October"
-]
+         "Mahatma Gandhi was born on 2nd October"]
 
 result = {}
 for text in texts:
