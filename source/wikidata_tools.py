@@ -1,4 +1,5 @@
 import requests
+from typing import List
 
 WIKIDATA_LANG = 'en'
 
@@ -8,6 +9,8 @@ PREFIX_P = 'wdt:'
 # Important wikidata properties
 P_SUBCLASS_OF = 'P279'
 P_INSTANCE_OF = 'P31'
+
+# REF: https://alexasteinbruck.medium.com/10-useful-things-about-wikidata-sparql-that-i-wish-i-knew-earlier-b0e0ef63c598
 
 def wikidata_actions_api(params: dict):
     # REF: https://www.jcchouinard.com/wikidata-api-python/
@@ -46,20 +49,31 @@ def search_entity(item: str):
 
     return data
 
-def get_entity(item: str):
+def get_entity(id: str):
     params = {
         'action': 'wbgetentities',
         'format': 'json',
         'languages': WIKIDATA_LANG,
-        'ids': item,
+        'ids': id,
         'props': 'labels|descriptions'
     }    
     data = wikidata_actions_api(params=params)
 
     return data
 
+def get_entity_props(ids: List[str], props: List[str]):
+    # Fetch item description: https://m.wikidata.org/wiki/Help:Description#How_to_query_them_in_sparql
+    itemDescQuery = f'''
+SELECT ?itemdesc WHERE {{
+    {id} schema:description ?itemdesc.
+    FILTER(LANG(?itemdesc) = "en")
+}}
+'''
+
+    pass
+
 def get_typeof(item: str, subclass=False):
-    """If subclass=True, Returns the uri(s) of all the wikidata entities whose subclass the item (Q...) is,
+    """If subclass=True, Returns the ID(s) of all the wikidata entities whose subclass the item (Q...) is,
     else, returns instanceOf...
     """
 
@@ -73,7 +87,9 @@ def get_typeof(item: str, subclass=False):
         
         res = []
         for c in r['results']['bindings']:
-            res.append(c['class']['value'])
+            url = c['class']['value']
+            id = url.rsplit('/', 1)[-1]
+            res.append(id)
         return res
     except:
         return []

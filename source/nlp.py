@@ -5,7 +5,7 @@ from transformers import pipeline
 from models import *
 from sbert_dist import sbert_embeddings
 from utils import nearest_vector
-from wikidata_tools import search_entity, get_typeof
+from wikidata_tools import search_entity, get_typeof, get_entity
 
 class KnowledgeExtractor:
     def __init__(self) -> None:
@@ -69,7 +69,7 @@ class KnowledgeExtractor:
                 if item in q_lbls:
                     best_match = q_lbls.index(item)
                 else:
-                    # Find closest match between [d['label'] for d in data['search']] and item, instead of reporting 1st result
+                    # Find closest match between various labels from search results and item
                     embs = sbert_embeddings([item] + q_lbls)
                     best_match = nearest_vector(embs[0], embs[1:])
 
@@ -77,7 +77,13 @@ class KnowledgeExtractor:
 
                 # TODO: How to select type from inst_of / subclass_of?
                 inst_of = get_typeof(entity['id'])
+                if len(inst_of) > 0:
+                    inst_of = get_entity(','.join(inst_of))
+
                 subclass_of = get_typeof(entity['id'], subclass=True)
+                if len(subclass_of) > 0:
+                    subclass_of = get_entity(','.join(subclass_of))
+
                 return KnowledgeTripletItem(
                     item=entity['label'],
                     info=entity['description'],
@@ -131,3 +137,43 @@ for text in texts:
     result[text] = engine.extract(text)
 
 print('done')
+
+########
+
+class Entity:
+    subclassOf: str
+    instOf: str
+
+subj = Entity()
+obj = Entity()
+relation = 'relation'
+
+def Map_Relation_Type():
+    if subj is not None:
+        if obj is not None:
+            if subj.subclassOf is None:
+                # Subj doesn't represent any type by itself (can we reconfirm this by check if subj root is a PROPN?)
+                if subj.instOf is not None:
+                    if relation is 'instanceOf':
+                        assert subj.instOf == obj
+                        print('subj isa obj')
+                    else:
+                        if obj is None:
+                            # obj is value of a property of subj
+                            print('subj has attribute relation with value obj')
+                        else:
+                            # TODO: is it required that obj is instance and not subclass?
+                            print('subj relation obj')
+                else:
+                    # is this possible?
+                    raise NotImplementedError()
+            else:
+                # Subj could be a type by itself, e.g. Film is a work of art
+                raise NotImplementedError()
+        else:
+            # Can't map obj to a std entity
+            if relation is not None:
+                # TODO: obj might be a property value
+                pass
+            else:
+                raise NotImplementedError()
