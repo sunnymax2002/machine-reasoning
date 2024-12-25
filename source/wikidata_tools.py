@@ -1,6 +1,7 @@
 import requests
 from typing import List
 
+# TODO: Move this as constructor param
 WIKIDATA_LANG = 'en'
 
 PREFIX_E = 'wd:'

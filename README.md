@@ -29,6 +29,10 @@ While WikiData is a powerful knowledge base, it does not support inference. Ther
 
 Can we use rule based NLP to deduce chain of thoughts for reasoning about a certain question?
 
+# Datasets
+
+ * [Children Story](https://www.kaggle.com/datasets/edenbd/children-stories-text-corpus)
+
 # Block Diagram
 
 ```mermaid

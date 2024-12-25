@@ -8,6 +8,7 @@ from utils import nearest_vector
 from wikidata_tools import search_entity, get_typeof, get_entity
 
 class KnowledgeExtractor:
+    # TODO: Add language param
     def __init__(self) -> None:
         self.rebel = None
 
