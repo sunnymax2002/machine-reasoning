@@ -1,0 +1,5 @@
+# Run this script using: typedb console --script=script.txt
+database create project_mgmt
+transaction project_mgmt schema write
+    source schema.tql
+    commit

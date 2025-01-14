@@ -1,0 +1,54 @@
+# Common attributes
+define
+    description sub attribute, value string;
+    filepath sub attribute, value string;
+
+# Entities
+define
+    # A user of the application
+    User sub entity,
+        owns name,
+        owns email,
+        owns userid;
+
+    # A project is a collection of activities which has a well defined outcome, and optionally also a lifecycle
+    Project sub entity;
+
+    # A task is an activity which is not large enough to quality as a project, and can be owned and completed by a single person
+    Task sub entity;
+
+    # System is a solution (e.g. a product, service etc.)
+    System sub entity;
+    Product sub System;
+    Service sub System;
+
+    # A chunk of a document, e.g. a requirement, which has an identity
+    DocumentChunk sub entity,
+        owns uid @id,
+        owns description,
+        owns filepath;
+
+    # A requirement which specifies what the solution must offer
+    Requirement sub DocumentChunk;
+
+    # Different types of requirement
+    FunctionalRequirement sub Requirement;
+    InterfaceRequirement sub Requirement;
+    PerformanceRequirement sub Requirement;
+
+    # Specification for a feature Implementation to meet a requirement
+    Specification sub DocumentChunk;
+
+    Implementation sub DocumentChunk;
+
+# Relations
+
+# TODO: How to model parent-child relation, e.g., parent task for a given sub-task
+define
+    fulfilled-by sub relation;
+        relates Requirement,
+        relates Specification;
+
+    implemented-by sub relation,
+        relates Specification,
+        relates Implementation;
