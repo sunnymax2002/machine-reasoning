@@ -1,11 +1,7 @@
 # REF: https://typedb.com/docs/drivers/2.x/python/
 
-import os
-os.add_dll_directory(r"C:\Program Files\Python313\DLLs")
-
 from typedb import driver
-
-from typedb.driver import TypeDB, SessionType, TransactionType
+from typedb.driver import TypeDB, TransactionType
 
 DB_NAME = "access-management-db"
 SERVER_ADDR = "127.0.0.1:1729"
