@@ -2,6 +2,11 @@
 define
     description sub attribute, value string;
     filepath sub attribute, value string;
+    textId sub attribute, value string;
+    numericId sub attribute, value long;
+    name sub attribute, value string;
+    email sub attribute, value string;
+    title sub attribute, value string;
 
 # Entities
 define
@@ -9,13 +14,15 @@ define
     User sub entity,
         owns name,
         owns email,
-        owns userid;
+        owns textId;
 
     # A project is a collection of activities which has a well defined outcome, and optionally also a lifecycle
     Project sub entity;
 
     # A task is an activity which is not large enough to quality as a project, and can be owned and completed by a single person
-    Task sub entity;
+    Task sub entity,
+        owns title,
+        owns description,
 
     # System is a solution (e.g. a product, service etc.)
     System sub entity;
@@ -24,7 +31,7 @@ define
 
     # A chunk of a document, e.g. a requirement, which has an identity
     DocumentChunk sub entity,
-        owns uid @id,
+        owns numericId @key,
         owns description,
         owns filepath;
 
@@ -45,10 +52,14 @@ define
 
 # TODO: How to model parent-child relation, e.g., parent task for a given sub-task
 define
-    fulfilled-by sub relation;
+    fulfilled-by sub relation,
         relates Requirement,
         relates Specification;
 
     implemented-by sub relation,
         relates Specification,
         relates Implementation;
+
+    # Task dependency relationship
+    depends-on sub relation,
+        relates Task;

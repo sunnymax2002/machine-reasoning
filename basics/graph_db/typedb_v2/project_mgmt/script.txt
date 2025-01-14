@@ -1,5 +1,6 @@
-# Run this script using: typedb console --script=script.txt
-database create project_mgmt
+# Run this script using: typedb console --script=C:\Users\sunny\git_repos\machine-reasoning\basics\graph_db\typedb_v2\project_mgmt\script.txt
+
+# database create project_mgmt
 transaction project_mgmt schema write
-    source schema.tql
+    source C:\Users\sunny\git_repos\machine-reasoning\basics\graph_db\typedb_v2\project_mgmt\schema.tql
     commit
