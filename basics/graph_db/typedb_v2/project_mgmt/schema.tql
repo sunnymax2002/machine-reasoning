@@ -57,6 +57,9 @@ define
 
     Testcase sub Specification;
 
+    # Change in a requirement, feature, implementation or testcase
+    Change sub Specification;
+
     # Component brings features to life. It is a part of a system
     Component sub entity,
         owns name,
@@ -88,11 +91,11 @@ define
 
     # A feature is implemented by an implementation
     implemented-by sub relation,
-        relates Feature,
-        relates Implementation;
+        relates implements,
+        relates implementation;
 
-    Feature plays implemented-by:Feature;
-    Implementation plays implemented-by:Implementation;
+    Feature plays implemented-by:implements;
+    Implementation plays implemented-by:implementation;
 
     # An implementation is verified by a testcase against a feature (reference)
     verified-by sub relation,
@@ -108,11 +111,28 @@ define
     # TODO: How to constraint that only the same type of Definition is derived from another Definition, e.g., Requirement is derived from Requirement and not from Specification
     derived-from sub relation,
         relates baseline,
-        relates derivative;
+        relates derivative,
+        relates change;
 
     Specification plays derived-from:baseline;
     Specification plays derived-from:derivative;
+    Change plays derived-from:change;
 
     # A Component can also be derived from another Component
+    # TODO: Should we separate the relation for Component and Specification? We don't want to populate the change attribute for Component, as it should be inferred from the Features which change in derived component
     Component plays derived-from:baseline;
     Component plays derived-from:derivative;
+
+    # A component has multiple feature implementations, and could be derived from existing components
+    composed-of sub relation,
+        relates implementation,
+        relates baseline;
+
+    Component plays composed-of:baseline;
+    Implementation plays composed-of:implementation;
+
+    # TODO: A component could derive partial functionality from another component, and implement the rest of the features. How to model this?
+    # Can we say ComponentX derives from ComponentA and ComponentB, but does-not-support FeatureQ, and changes ImplementationK
+    does-not-support sub relation,
+        relates Component,
+        relates Feature;
