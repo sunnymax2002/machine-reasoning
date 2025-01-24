@@ -19,7 +19,12 @@ define
     # A project is a collection of activities which has a well defined outcome, and optionally also a lifecycle
     Project sub entity;
 
-    # A task is an activity which is not large enough to quality as a project, and can be owned and completed by a single person
+    Milestone sub entity,
+        owns title,
+        owns description,
+        owns numericId @key;
+
+    # A task is an activity which is not large enough to qualify as a project, and can be owned and completed by a single person
     Task sub entity,
         owns title,
         owns description,
@@ -29,14 +34,15 @@ define
     Product sub System;
     Service sub System;
 
-    # A chunk of a document, e.g. a requirement, which has an identity
-    DocumentChunk sub entity,
+    # An entity that defines something, e.g. a requirement
+    Definition sub entity, abstract,
         owns numericId @key,
+        owns title,
         owns description,
-        owns filepath;
+        owns filepath;  # Details e.g. code or image file
 
     # A requirement which specifies what the solution must offer
-    Requirement sub DocumentChunk;
+    Requirement sub Definition;
 
     # Different types of requirement
     FunctionalRequirement sub Requirement;
@@ -44,10 +50,11 @@ define
     PerformanceRequirement sub Requirement;
 
     # Specification for a feature Implementation to meet a requirement
-    Specification sub DocumentChunk;
+    Specification sub Definition;
 
-    Implementation sub DocumentChunk;
+    Implementation sub Definition;
 
+    Testcase sub Definition;
 # Relations
 
 # TODO: How to model parent-child relation, e.g., parent task for a given sub-task
@@ -56,10 +63,26 @@ define
         relates Requirement,
         relates Specification;
 
+    Requirement plays fulfilled-by:Requirement;
+    Specification plays fulfilled-by:Specification;
+
     implemented-by sub relation,
         relates Specification,
         relates Implementation;
 
+    Specification plays implemented-by:Specification;
+    Implementation plays implemented-by:Implementation;
+
     # Task dependency relationship
     depends-on sub relation,
         relates Task;
+
+    verified-by sub relation,
+        relates Specification,
+        relates Implementation,
+        relates Testcase;
+
+    Specification plays verified-by:Specification;
+    Implementation plays verified-by:Implementation;
+    Testcase plays verified-by:Testcase;
+    
