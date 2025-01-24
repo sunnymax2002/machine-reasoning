@@ -27,62 +27,92 @@ define
     # A task is an activity which is not large enough to qualify as a project, and can be owned and completed by a single person
     Task sub entity,
         owns title,
-        owns description,
+        owns description;
 
     # System is a solution (e.g. a product, service etc.)
     System sub entity;
     Product sub System;
     Service sub System;
 
-    # An entity that defines something, e.g. a requirement
-    Definition sub entity, abstract,
+    # An entity that defines/specifies something, e.g. a requirement
+    Specification sub entity, abstract,
         owns numericId @key,
         owns title,
         owns description,
         owns filepath;  # Details e.g. code or image file
 
     # A requirement which specifies what the solution must offer
-    Requirement sub Definition;
+    Requirement sub Specification;
 
     # Different types of requirement
     FunctionalRequirement sub Requirement;
     InterfaceRequirement sub Requirement;
     PerformanceRequirement sub Requirement;
+    SecurityRequirement sub Requirement;
 
-    # Specification for a feature Implementation to meet a requirement
-    Specification sub Definition;
+    # Feature Implementation to meet a requirement
+    Feature sub Specification;
 
-    Implementation sub Definition;
+    Implementation sub Specification;
 
-    Testcase sub Definition;
+    Testcase sub Specification;
+
+    # Component brings features to life. It is a part of a system
+    Component sub entity,
+        owns name,
+        owns description;
+
+    HardwareComponent sub Component;
+    SoftwareComponent sub Component;
+    FirmwareComponent sub Component;
+
 # Relations
 
 # TODO: How to model parent-child relation, e.g., parent task for a given sub-task
 define
-    fulfilled-by sub relation,
-        relates Requirement,
-        relates Specification;
-
-    Requirement plays fulfilled-by:Requirement;
-    Specification plays fulfilled-by:Specification;
-
-    implemented-by sub relation,
-        relates Specification,
-        relates Implementation;
-
-    Specification plays implemented-by:Specification;
-    Implementation plays implemented-by:Implementation;
-
     # Task dependency relationship
     depends-on sub relation,
         relates Task;
 
-    verified-by sub relation,
-        relates Specification,
-        relates Implementation,
-        relates Testcase;
+    #######################################################################
+    # Relations between Requirement, Feature, Implementation and Testcase #
+    #######################################################################
 
-    Specification plays verified-by:Specification;
-    Implementation plays verified-by:Implementation;
-    Testcase plays verified-by:Testcase;
+    # A requirement is fulfilled by a feature
+    fulfilled-by sub relation,
+        relates Requirement,
+        relates Feature;
+
+    Requirement plays fulfilled-by:Requirement;
+    Feature plays fulfilled-by:Feature;
+
+    # A feature is implemented by an implementation
+    implemented-by sub relation,
+        relates Feature,
+        relates Implementation;
+
+    Feature plays implemented-by:Feature;
+    Implementation plays implemented-by:Implementation;
+
+    # An implementation is verified by a testcase against a feature (reference)
+    verified-by sub relation,
+        relates reference,
+        relates verified,
+        relates verifier;
+
+    Feature plays verified-by:reference;
+    Implementation plays verified-by:verified;
+    Testcase plays verified-by:verifier;
     
+    # Derive from a baseline Definition
+    # TODO: How to constraint that only the same type of Definition is derived from another Definition, e.g., Requirement is derived from Requirement and not from Specification
+    derived-from sub relation,
+        relates baseline,
+        relates derivative;
+
+    Specification plays derived-from:baseline;
+    Specification plays derived-from:derivative;
+
+    # A Component can also be derived from another Component
+    Component plays derived-from:baseline;
+    Component plays derived-from:derivative;
