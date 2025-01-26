@@ -43,7 +43,15 @@ define
 
 define
     # An entity that defines/specifies something, e.g. a requirement
-    Specification sub entity, abstract;
+    # TODO: Add a unique ID, perhaps using time based hash?
+    Specification sub entity, abstract,
+        owns title,
+        owns description;
+
+    # A Specifications may apply to multiple domains, e.g. Reset, Power management, etc.
+    Domain sub entity,
+        owns title,
+        owns description;
 
     # A requirement which specifies what the solution must offer
     Requirement sub Specification;
@@ -66,6 +74,11 @@ define
 
     # A problem is a situation that needs to be solved
     Problem sub entity;
+
+    # A problem may apply to one or more application areas, and systems are used in multiple applications
+    Application sub entity,
+        owns title,
+        owns description;
 
     # System is a solution (e.g. a product, service etc.) that solves problems
     # System Component brings features to life. It is a part of a system
@@ -148,3 +161,26 @@ define
         relates problem;
     System plays solves:system;
     Problem plays solves:problem;
+
+    ## Rules ##
+
+    # TODO: If a feature applies to a domain, then the implementation should also apply to the same domain - add such inference rules
+    of-domain sub relation,
+        relates specification,
+        relates domain;
+    Specification plays of-domain:specification;
+    Domain plays of-domain:domain;
+
+    # A requirement applies to one or more application areas
+    applies-to sub relation,
+        relates requirement,
+        relates application;
+    Requirement plays applies-to:requirement;
+    Application plays applies-to:application;
+
+    # A system may only be used in certain application
+    used-in sub relation,
+        relates system,
+        relates application;
+    System plays used-in:system;
+    Application plays used-in:application;
