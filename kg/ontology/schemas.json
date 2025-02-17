@@ -1,0 +1,8 @@
+{
+	"schemas": {
+		"project_mgmt": {
+			"tql": "",
+			"dependencies": []
+		}
+	}
+}

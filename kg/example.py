@@ -10,3 +10,8 @@ with open(yaml_path) as stream:
 	config = yaml.safe_load(stream)
 
 engine = TypeDbEngine(config)
+
+engine.db_create()
+engine.db_delete()
+
+print('Done')

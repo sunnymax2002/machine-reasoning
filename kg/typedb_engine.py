@@ -1,7 +1,11 @@
 # REF: https://github.com/typedb/typedb-docs/blob/3.x-master/drivers/modules/ROOT/partials/tutorials/python/sample.py
 
-from typedb.driver import TypeDB, TransactionType, Credentials, DriverOptions
 from enum import Enum
+import os
+import sys
+import json
+
+from typedb.driver import TypeDB, TransactionType, Credentials, DriverOptions
 
 class TypeDbEngine:
 	class DbType(Enum):
@@ -16,13 +20,46 @@ class TypeDbEngine:
 	def __init__(self, config: dict):
 		self.server_addr = config[self.K_SERVER_ADDR]
 		self.db_type = config[self.K_DB_TYPE]
-		# TODO: Is it secure to store credentials?
+		# TODO: Is it secure to store credentials in memory?
 		self.cred = Credentials(config[self.K_USERNAME], config[self.K_PASSWORD])
 		self.db_name = config[self.K_DB_NAME]
 
-		# TODO: Add support for core db
-		# Connect to cloud database
-		with TypeDB.cloud_driver([self.server_addr], self.cred, DriverOptions(True, None)) as drv:
-			if drv.databases.contains(self.db_name):
-				drv.databases.get(self.db_name).delete()
-			drv.databases.create(self.db_name)
+		# Schema dependency dict
+		p = os.path.join(sys.path[0], "ontology/schemas.json")
+		with open(p, 'r') as file:
+			self.schemas_dict = json.load(file)
+
+		# Lazy loading of typedb_driver
+		self.typedb_drv = None
+
+	def _get_typedb_driver(self):
+		# Connect to server
+		if self.typedb_drv is None:
+			# TODO: Add support for core db
+			self.typedb_drv = TypeDB.cloud_driver([self.server_addr], self.cred, DriverOptions(True, None))
+		elif not self.typedb_drv.is_open():
+			# TODO: how to reconnect, instead of recreating?
+			self.typedb_drv = TypeDB.cloud_driver([self.server_addr], self.cred, DriverOptions(True, None))
+
+		return self.typedb_drv
+	
+	def _get_db_name(self, db_name: str):
+		return self.db_name if db_name is None else db_name
+
+	def db_create(self, db_name: str = None):
+		dbn = self._get_db_name(db_name)
+		drv = self._get_typedb_driver()
+		if drv.databases.contains(dbn):
+			raise Exception("Database already exists")
+		drv.databases.create(dbn)
+
+	def db_delete(self, db_name: str = None):
+		dbn = self._get_db_name(db_name)
+		drv = self._get_typedb_driver()
+		if not drv.databases.contains(dbn):
+			raise Exception("Database doesn't exists")
+		drv.databases.get(dbn).delete()
+
+	def close_server_connection(self):
+		if self.typedb_drv is not None and self.typedb_drv.is_open():
+			self.typedb_drv.close()
