@@ -4,10 +4,8 @@
 from typedb.driver import TypeDB, TransactionType, Credentials, DriverOptions
 
 DB_NAME = "access-management-db"
+SERVER_ADDR = "https://mbk0eq-0.cluster.typedb.com:80" #"127.0.0.1:1729"
 SERVER_ADDR = "https://e7c5l9-0.cluster.typedb.com:80"
-
-USERNAME = "admin"
-PASSWORD = "ju9kya$d"
 
 def donotrun():
     with TypeDB.cloud_driver([SERVER_ADDR], Credentials(USERNAME, PASSWORD), DriverOptions(True, None)) as drv:
