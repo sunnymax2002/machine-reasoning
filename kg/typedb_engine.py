@@ -63,3 +63,20 @@ class TypeDbEngine:
 	def close_server_connection(self):
 		if self.typedb_drv is not None and self.typedb_drv.is_open():
 			self.typedb_drv.close()
+
+	def schema_add(ontology: str):
+		"Adds specified ontology and its dependencies to the schema"
+		raise NotImplementedError()
+	
+	def schema_add_raw(tql_path: str):
+		# TODO: Use file handle instead of string to allow in memory files
+		"Adds schema based on specified TypeQL query file"
+		raise NotImplementedError()
+	
+	def ontology_add(ontology: dict):
+		"Augments core ontology map using specified dictionary"
+		raise NotImplementedError()
+	
+	def db_write():
+		"Writes to db based on specified TypeQL query, but doesn't allow any schema edits"
+		raise NotImplementedError()
