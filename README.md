@@ -3,6 +3,18 @@ Efficient, Explainable Machine Reasoning
 
 The goal is to use efficient methods (most often, far more efficient than LLM), wherever possible, to implement the desired functions
 
+> Given a knowledge graph (e.g. WikiData), and a question (either in natural language, or in a structured form), use graph search and inference to find the answer (or at least a structured intermediate answer, that can be used to construct the desired outcome)
+
+## Examples
+
+## Inferencing Knowledge
+
+While WikiData is a powerful knowledge base, it does not support inference. There have been attempts in the past such as [SPIN](), but they didn't take off. One important goal of this project is to bring powerful inferencing capabilities to WikiData
+
+## Chain of Thought Reasoning
+
+Can we use rule based NLP to deduce chain of thoughts for reasoning about a certain question?
+
 # Information Extraction
 
 Map natural language information (from textbook chapters, technical papers or articles) to standard ontology and knowledge base such as [WikiData](https://www.wikidata.org/wiki/Wikidata:Main_Page)
@@ -21,19 +33,11 @@ Once extracted triple is normalized, in order to integrate inference capabilitie
 2. Object is an attribute of the Subject (define attribute for type of subject)
 3. A proper relation between two entities
 
-# Inferencing Knowledge
-
-While WikiData is a powerful knowledge base, it does not support inference. There have been attempts in the past such as [SPIN](), but they didn't take off. One important goal of this project is to bring powerful inferencing capabilities to WikiData
-
-# Chain of Thought Reasoning
-
-Can we use rule based NLP to deduce chain of thoughts for reasoning about a certain question?
-
-# Datasets
+## Datasets
 
  * [Children Story](https://www.kaggle.com/datasets/edenbd/children-stories-text-corpus)
 
-# Block Diagram
+## Block Diagram
 
 ```mermaid
 flowchart TD
