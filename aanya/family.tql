@@ -1,0 +1,40 @@
+# Define a person entitiy 
+define
+  entity person,
+    owns name,
+    plays childOf:child;
+
+  relation childOf,
+    relates parent,
+    relates child;
+
+#
+
+insert
+  	$p2 isa person, has name "Bhoomika";
+insert
+ 	$p isa person, has name "Sunny";
+insert
+	$ isa person, has name "Vihaan";
+insert
+  $ isa person, has name "Aanya";
+# Define a function to automatically create a relation between two siblings
+define
+	fun siblings_unique() -> { person, person }:
+		match
+			childOf (parent: $parent, child: $sib1);
+			childOf (parent: $parent, child: $sib2);
+			not { $sib1 is $sib2; };
+			$sib1 has name $n1;
+			$sib2 has name $n2;
+			$n1 < $n2;
+		return { $sib1, $sib2 };
+
+
+match
+  let $sib1, $sib2 in siblings_unique();
+fetch {
+  "sibling_1": $sib1.name,
+  "sibling_2": $sib2.name
+};
+
