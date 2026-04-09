@@ -119,7 +119,7 @@ class KnowledgeExtractor:
             )
 
             kt_list.append(kt)
-
+0
         return kt_list
 
 engine = KnowledgeExtractor()
