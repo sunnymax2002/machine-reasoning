@@ -4,8 +4,6 @@ I want to build a simple program that answers simple questions. Nowadays, LLM"s 
 ## Main Goal 
 My project is about a graph answering questions using some clues. Just give it some realy simple questions and it attempts to solve them using inference.
 
-### Step 1 : Training 
-To train a simple graph search 
 ```mermaid
 flowchart TD
 	A(Puzzles - input<br>without answers) --> B(Bag of Words - proces<br>infrequent words)
