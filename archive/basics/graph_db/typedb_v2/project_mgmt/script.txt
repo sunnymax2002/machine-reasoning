@@ -1,0 +1,11 @@
+# Run this script using: typedb console --script=C:\Users\sunny\git_repos\machine-reasoning\basics\graph_db\typedb_v2\project_mgmt\script.txt
+
+database delete project_mgmt
+database create project_mgmt
+transaction project_mgmt schema write
+    source C:\Users\sunny\git_repos\machine-reasoning\basics\graph_db\typedb_v2\project_mgmt\schema.tql
+    commit
+
+transaction project_mgmt data write
+    source C:\Users\sunny\git_repos\machine-reasoning\basics\graph_db\typedb_v2\project_mgmt\data.tql
+    commit
