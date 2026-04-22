@@ -1,5 +1,0 @@
-SERVER_ADDR: "https://e7c5l9-0.cluster.typedb.com:80"
-DB_TYPE: 1
-USERNAME: "admin"
-PASSWORD: "ju9kya$d"
-DB_NAME: "access-management-db"
