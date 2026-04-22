@@ -6,7 +6,7 @@ My project is about a graph answering questions using some clues. Just give it s
 
 ```mermaid
 flowchart TD
-	A(Puzzles - input<br>without answers) --> B(Bag of Words - proces<br>infrequent words)
+	A(Puzzles - input<br>without answers) --> B(Bag of Words - process<br>infrequent words)
 	B --> C(Wikidata - output<br>a graph triplet)
 
 	style A stroke:yellow
