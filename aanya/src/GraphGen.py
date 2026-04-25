@@ -1,14 +1,27 @@
+!pip install spacy_layout
+import spacy
+from spacy_layout import spaCyLayout
 from typing import List
 
 # Project specific imports
 from models import *
 
 class GraphGen:
-	def importPDF():
+	def importPDF(file_path:str):
 		"""
 		Function to import a single PDF file (e.g a chapter or entire textbook)
+		and return a spaCy pipeline object
 
 		"""
+		nlp = spacy.blank("en")
+		layout = spaCyLayout(nlp)
+
+		# Process PDF directly into a spaCy Doc object
+		doc = layout(file_path)
+
+		# Access extracted text and layout features
+		print(doc.text)
+		print(doc._.tables) # Access extracted tables
 		pass
 
 	def extractSentences(pdfText: str) -> List[str]:
